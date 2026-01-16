@@ -1,0 +1,11 @@
+import pandas as pd
+
+df = pd.read_csv("data/raw/career_dataset_v3.csv")
+print(df.shape)
+
+print(df['role'].value_counts())
+
+print(df.describe())
+
+sampledf = df.sample(10)
+print(sampledf)
