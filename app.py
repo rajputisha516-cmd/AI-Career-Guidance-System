@@ -1,5 +1,7 @@
 from utils.resume_parser import extract_text_from_pdf, extract_skills_from_resume
 from utils.intent_handler import detect_user_intent, get_intent_message
+from utils.role_guidance import get_role_specific_guidance
+
 
 import streamlit as st
 import pickle
@@ -192,23 +194,8 @@ if st.session_state.predicted:
 
     st.subheader("📘 Personalized Guidance")
 
-    if user_level == "Beginner":
-        st.info(
-            "You are at a beginner level. Focus on building strong fundamentals "
-            "before moving to advanced concepts."
-        )
-
-    elif user_level == "Intermediate":
-        st.info(
-            "You have decent fundamentals. Start working on real-world projects "
-            "and strengthen weak areas."
-        )
-
-    else:
-        st.success(
-            "You are ready for this role. You can start applying for internships "
-            "or entry-level positions."
-        )
+    guidance_text = get_role_specific_guidance(career, user_level)
+    st.info(guidance_text)
 
 
     # ================= Roadmap (UNCHANGED) =================
