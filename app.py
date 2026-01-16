@@ -1,4 +1,5 @@
 from utils.resume_parser import extract_text_from_pdf, extract_skills_from_resume
+from utils.intent_handler import detect_user_intent, get_intent_message
 
 import streamlit as st
 import pickle
@@ -92,6 +93,17 @@ with col2:
     stats_level = st.selectbox("Statistics", level_map.keys())
     communication_level = st.selectbox("Communication", level_map.keys())
 
+    
+    selected_levels = {
+    "python": python_level,
+    "sql": sql_level,
+    "statistics": stats_level,
+    "ml": ml_level,
+    "dl": dl_level,
+    "nlp": nlp_level
+    }
+
+
 # ================= Predict Button =================
 st.markdown("---")
 if st.button("🚀 Predict Career Path"):
@@ -122,6 +134,14 @@ if st.session_state.predicted:
     ])
 
     career = label_encoder.inverse_transform(model.predict(user_data))[0]
+
+    # ================= Intent Detection & Explanation (NEW) =================
+    intents = detect_user_intent(level_map, selected_levels)
+    intent_msg = get_intent_message(career, intents)
+
+    if intent_msg:
+        st.info(intent_msg)
+
 
     st.markdown(
         f"""
@@ -158,6 +178,38 @@ if st.session_state.predicted:
     )
     st.progress(readiness)
     st.caption(f"You are approximately {readiness}% ready for this role")
+
+    # ================= Skill Level Classification =================
+    if readiness < 40:
+        user_level = "Beginner"
+    elif readiness < 70:
+        user_level = "Intermediate"
+    else:
+        user_level = "Ready"
+
+    st.subheader("🧭 Your Current Level")
+    st.success(f"You are at **{user_level}** level for the {career} role")
+
+    st.subheader("📘 Personalized Guidance")
+
+    if user_level == "Beginner":
+        st.info(
+            "You are at a beginner level. Focus on building strong fundamentals "
+            "before moving to advanced concepts."
+        )
+
+    elif user_level == "Intermediate":
+        st.info(
+            "You have decent fundamentals. Start working on real-world projects "
+            "and strengthen weak areas."
+        )
+
+    else:
+        st.success(
+            "You are ready for this role. You can start applying for internships "
+            "or entry-level positions."
+        )
+
 
     # ================= Roadmap (UNCHANGED) =================
     with st.expander("📌 View Personalized Roadmap"):
